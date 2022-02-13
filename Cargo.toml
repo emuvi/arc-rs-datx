@@ -1,5 +1,5 @@
 [package]
-name = "fito"
+name = "datx"
 description = "Datx is a library and a command program that features a toolbox with a series of data base functionalities."
 repository = "https://github.com/emuvi/datx/"
 authors = ["Éverton M. Vieira"]
