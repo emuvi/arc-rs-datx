@@ -1,0 +1,8 @@
+[package]
+name = "fito"
+description = "Datx is a library and a command program that features a toolbox with a series of data base functionalities."
+repository = "https://github.com/emuvi/datx/"
+authors = ["Éverton M. Vieira"]
+license = "LGPL-3.0-only"
+version = "0.1.0"
+edition = "2021"
