@@ -15,8 +15,8 @@ pub fn parse() -> ArgMatches {
         .help("The URL connection for the database.")
     )
     .arg(
-      Arg::new("export_to_csv")
-        .long("export_to_csv")
+      Arg::new("export-to-csv")
+        .long("export-to-csv")
         .takes_value(true)
         .value_name("DIR")
         .help("Export all tables to CSV files on the DIR argument.")
