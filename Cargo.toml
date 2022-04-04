@@ -1,16 +1,8 @@
 [package]
 name = "datx"
-description = "Datx (Data Base Toolbox) is a library and a command program that features a toolbox with a series of data base functionalities."
+description = "Datx (Data Transform Toolbox) is a library and a command program that features a toolbox with a series of data transformation functionalities."
 repository = "https://github.com/emuvi/datx/"
 authors = ["Éverton M. Vieira"]
 license = "LGPL-3.0-only"
 version = "0.1.1"
 edition = "2021"
-
-[dependencies]
-clap = { version = "3", features = ["cargo"] }
-tokio = { version = "1", features = ["full"] }
-sqlx = { version = "0.5", features = ["runtime-tokio-rustls", "all", "chrono"] }
-futures = "0.3"
-chrono = "0.4"
-liz = { path = "../liz" }
