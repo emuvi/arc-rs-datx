@@ -1,7 +1,13 @@
 use regex::Regex;
 
 #[derive(Debug)]
-pub enum From {
+pub struct From {
+  pub name: String,
+  pub kind: FromKind,
+}
+
+#[derive(Debug)]
+pub enum FromKind {
   Path(String),
   StdInBody,
   StdInPath,
@@ -10,8 +16,15 @@ pub enum From {
 #[derive(Debug)]
 pub struct Load {
   pub name: String,
+  pub from: LoadFrom,
   pub hunt: Regex,
   pub zone: Zone,
+}
+
+#[derive(Debug)]
+pub enum LoadFrom {
+  All,
+  Name(String),
 }
 
 #[derive(Debug)]
