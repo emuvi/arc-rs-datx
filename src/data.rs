@@ -31,23 +31,23 @@ pub struct Load {
 #[derive(Debug)]
 pub enum LoadFrom {
   All,
-  Name(String),
+  The(String),
 }
 
 #[derive(Debug)]
 pub enum Zone {
-  Body,
-  Line,
-  Load(String),
+  OnBody,
+  OnLine,
+  OnLoad(String),
 }
 
 #[derive(Debug)]
 pub enum Save {
-  ToFile(OnFile),
+  ToFile(File),
 }
 
 #[derive(Debug)]
-pub struct OnFile {
+pub struct File {
   pub path: Dict,
   pub body: Dict,
 }
