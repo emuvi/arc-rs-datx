@@ -8,13 +8,6 @@ pub enum From {
 }
 
 #[derive(Debug)]
-pub enum Zone {
-  Body,
-  Line,
-  Load(String),
-}
-
-#[derive(Debug)]
 pub struct Load {
   pub name: String,
   pub hunt: Regex,
@@ -22,12 +15,11 @@ pub struct Load {
 }
 
 #[derive(Debug)]
-pub enum Word {
-  Like(String),
+pub enum Zone {
+  Body,
+  Line,
   Load(String),
 }
-
-pub type Dict = Vec<Word>;
 
 #[derive(Debug)]
 pub enum Save {
@@ -38,4 +30,12 @@ pub enum Save {
 pub struct OnFile {
   pub path: Dict,
   pub body: Dict,
+}
+
+pub type Dict = Vec<Word>;
+
+#[derive(Debug)]
+pub enum Word {
+  Like(String),
+  Load(String),
 }
