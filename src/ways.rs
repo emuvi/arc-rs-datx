@@ -43,11 +43,11 @@ pub enum Zone {
 
 #[derive(Debug)]
 pub enum Save {
-  ToFile(File),
+  ToFile(OnFile),
 }
 
 #[derive(Debug)]
-pub struct File {
+pub struct OnFile {
   pub path: Dict,
   pub body: Dict,
 }
@@ -56,6 +56,7 @@ pub type Dict = Vec<Word>;
 
 #[derive(Debug)]
 pub enum Word {
-  Like(String),
-  Load(String),
+  As(String),
+  AsLoad(String),
+  AsAllLoad,
 }
