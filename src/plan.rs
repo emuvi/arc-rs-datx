@@ -29,7 +29,8 @@ impl Parser {
     }
     while self.index < self.size() {
       let arg_on = self.get_arg_on();
-      match arg_on {
+      self.go_further(1);
+      match arg_on.as_ref() {
         "from" => self.parse_from(),
         "load" => self.parse_load(),
         "save" => self.parse_save(),
@@ -39,32 +40,37 @@ impl Parser {
   }
 
   fn parse_from(&mut self) {
-    let mut delta = 1;
-    let mut inc_by = 2;
-    let first = self.get_arg_by(delta);
+    let first = self.get_arg_on();
+    if is_closer(&first) {
+      self.from.push(From {
+        name: String::default(),
+        kind: FromKind::StdInBody,
+      });
+      return;
+    }
+    self.go_further(1);
     let (name, kind) = if first.starts_with("--") {
       let name = String::default();
       let kind = first;
       (name, kind)
     } else {
-      let name = String::from(first);
-      delta += 1;
-      inc_by += 1;
-      let kind = self.get_arg_by(delta);
+      let name = first;
+      let kind = self.get_arg_on();
+      self.go_further(1);
       (name, kind)
     };
-    let kind = match kind {
+    let kind = match kind.as_ref() {
       "--path" => {
-        delta += 1;
-        inc_by += 1;
-        FromKind::Path(self.get_arg_by(delta).into())
+        let path = self.get_arg_on();
+        self.go_further(1);
+        FromKind::Path(path)
       }
       "--stdin-path" => FromKind::StdInPath,
       "--stdin-body" => FromKind::StdInBody,
-      _ => panic!("Unknown from kind: {}", first),
+      "" => FromKind::StdInBody,
+      _ => panic!("Unknown from kind: {}", kind),
     };
     self.from.push(From { name, kind });
-    self.inc_index(inc_by);
   }
 
   fn parse_load(&mut self) {
@@ -72,42 +78,36 @@ impl Parser {
     let mut from = LoadFrom::All;
     let mut hunt = Regex::new(".*").unwrap();
     let mut zone = Zone::OnBody;
-    let mut delta = 0;
-    let mut inc_by = 1;
     let mut get_part_of_from_or_break = || {
-      delta += 1;
-      inc_by += 1;
-      let arg = self.get_arg_by(delta);
-      if arg == "from" || arg == "load" || arg == "save" || arg == "" {
-        delta -= 1;
-        inc_by -= 1;
-        false
-      } else if arg.starts_with("r'") {
+      let arg = self.get_arg_on();
+      if is_closer(&arg) {
+        return false;
+      }
+      self.go_further(1);
+      if arg.starts_with("r'") {
         hunt = Regex::new(&arg[2..arg.len() - 1]).unwrap();
-        true
       } else if arg.starts_with("--") {
         if arg == "--all" {
           from = LoadFrom::All;
         } else if arg == "--the" {
-          delta += 1;
-          inc_by += 1;
-          from = LoadFrom::The(self.get_arg_by(delta).into())
+          let the = self.get_arg_on();
+          self.go_further(1);
+          from = LoadFrom::The(the.into());
         } else if arg == "--on-body" {
           zone = Zone::OnBody;
         } else if arg == "--on-line" {
           zone = Zone::OnLine;
         } else if arg == "--on-load" {
-          delta += 1;
-          inc_by += 1;
-          zone = Zone::OnLoad(self.get_arg_by(delta).into());
+          let load = self.get_arg_on();
+          self.go_further(1);
+          zone = Zone::OnLoad(load.into());
         } else {
           panic!("Unknown load kind: {}", arg);
         }
-        true
       } else {
         name = arg.into();
-        true
       }
+      true
     };
     while get_part_of_from_or_break() {}
     self.load.push(Load {
@@ -116,26 +116,108 @@ impl Parser {
       hunt,
       zone,
     });
-    self.inc_index(inc_by);
   }
 
-  fn parse_save(&mut self) {}
+  fn parse_save(&mut self) {
+    let place = self.get_arg_on();
+    if is_closer(&place) {
+      self.save.push(Save::ToFile(OnFile {
+        path: vec![Word::As("output.txt".into())],
+        body: vec![Word::AsAllLoad],
+      }));
+      return;
+    }
+    self.go_further(1);
+    if place == "--on-file" {
+      let on_file = self.get_save_on_file();
+      self.save.push(Save::ToFile(on_file));
+    } else {
+      panic!("Unknown save place: {}", place);
+    }
+  }
 
-  fn inc_index(&mut self, by: usize) {
+  fn get_save_on_file(&mut self) -> OnFile {
+    let mut part = self.get_arg_on();
+    if !part.starts_with("--") {
+      let mut body = vec![];
+      let path = vec![Word::As("output.txt".into())];
+      self.get_dict(&mut body);
+      return OnFile { path, body };
+    }
+    let mut path = vec![];
+    let mut body = vec![];
+    loop {
+      self.go_further(1);
+      if part == "--path" {
+        self.get_dict(&mut path);
+      } else if part == "--body" {
+        self.get_dict(&mut body);
+      } else {
+        panic!("Unknown save on file part: {}", part);
+      }
+      part = self.get_arg_on();
+      if is_closer(&part) {
+        break;
+      }
+    }
+    return OnFile { path, body };
+  }
+
+  fn get_dict(&mut self, on: &mut Dict) {
+    loop {
+      let word = self.get_arg_on();
+      if is_closer(&word) {
+        return;
+      }
+      self.go_further(1);
+      if word.starts_with("--") {
+        if word == "--done" {
+          return;
+        } else if word == "--path" || word == "--body" {
+          self.go_back(1);
+          return;
+        } else if word == "--as" {
+          let like = self.get_arg_on();
+          self.go_further(1);
+          on.push(Word::As(like.into()));
+        } else if word == "--as-load" {
+          let load_name = self.get_arg_on();
+          self.go_further(1);
+          on.push(Word::AsLoad(load_name.into()));
+        } else if word == "--as-all-load" {
+          on.push(Word::AsAllLoad);
+        } else {
+          panic!("Unknown dict word: {}", word);
+        }
+      } else {
+        on.push(Word::As(word.into()));
+      }
+    }
+  }
+
+  fn go_further(&mut self, by: usize) {
     self.index += by;
   }
 
-  fn get_arg_on(&self) -> &str {
-    &self.args[self.index]
+  fn go_back(&mut self, by: usize) {
+    self.index -= by;
   }
 
-  fn get_arg_by(&self, delta: usize) -> &str {
-    let arg_by = self.index + delta;
-    if arg_by >= self.size() {
-      return "";
+  fn get_arg_on(&self) -> String {
+    if self.index < self.size() {
+      self.args[self.index].clone()
+    } else {
+      String::default()
     }
-    &self.args[arg_by]
   }
+
+  // fn get_arg_by(&self, delta: usize) -> &str {
+  //   let arg_by = self.index + delta;
+  //   if arg_by >= self.size() {
+  //     return "";
+  //   }
+  //   &self.args[arg_by]
+  // }
 
   fn size(&self) -> usize {
     self.args.len()
@@ -154,4 +236,8 @@ pub fn parse(args: Vec<String>, ignore_first: bool) -> Datx {
   let mut parser = Parser::new(args, ignore_first);
   parser.parse_all();
   parser.get()
+}
+
+fn is_closer(arg: &str) -> bool {
+  arg == "from" || arg == "load" || arg == "save" || arg == ""
 }
