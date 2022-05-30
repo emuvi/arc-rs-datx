@@ -1,3 +1,7 @@
+use std::env;
+
 fn main() {
-    println!("Datx (Data Transform Toolbox) is a library and a command program that features a toolbox with a series of data transformation functionalities.")
+  let args: Vec<String> = env::args().collect();
+  let datx = datx::parse(args);
+  println!("{:?}", datx);
 }
