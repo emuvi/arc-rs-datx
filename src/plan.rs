@@ -92,7 +92,7 @@ impl Parser {
         } else if arg == "--the" {
           let the = self.get_arg_on();
           self.go_further(1);
-          from = LoadFrom::The(the.into());
+          from = LoadFrom::The(the);
         } else if arg == "--on-body" {
           zone = Zone::OnBody;
         } else if arg == "--on-line" {
@@ -100,12 +100,12 @@ impl Parser {
         } else if arg == "--on-load" {
           let load = self.get_arg_on();
           self.go_further(1);
-          zone = Zone::OnLoad(load.into());
+          zone = Zone::OnLoad(load);
         } else {
           panic!("Unknown load kind: {}", arg);
         }
       } else {
-        name = arg.into();
+        name = arg;
       }
       true
     };
@@ -179,18 +179,18 @@ impl Parser {
         } else if word == "--as" {
           let like = self.get_arg_on();
           self.go_further(1);
-          on.push(Word::As(like.into()));
+          on.push(Word::As(like));
         } else if word == "--as-load" {
           let load_name = self.get_arg_on();
           self.go_further(1);
-          on.push(Word::AsLoad(load_name.into()));
+          on.push(Word::AsLoad(load_name));
         } else if word == "--as-all-load" {
           on.push(Word::AsAllLoad);
         } else {
           panic!("Unknown dict word: {}", word);
         }
       } else {
-        on.push(Word::As(word.into()));
+        on.push(Word::As(word));
       }
     }
   }
