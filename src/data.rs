@@ -1,6 +1,13 @@
 use regex::Regex;
 
 #[derive(Debug)]
+pub struct Datx {
+  pub from: Vec<From>,
+  pub load: Vec<Load>,
+  pub save: Vec<Save>,
+}
+
+#[derive(Debug)]
 pub struct From {
   pub name: String,
   pub kind: FromKind,
@@ -9,8 +16,8 @@ pub struct From {
 #[derive(Debug)]
 pub enum FromKind {
   Path(String),
-  StdInBody,
   StdInPath,
+  StdInBody,
 }
 
 #[derive(Debug)]
