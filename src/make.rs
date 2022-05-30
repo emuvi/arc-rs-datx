@@ -1,4 +1,4 @@
-use crate::data::*;
+use crate::ways::*;
 
 struct Parser {
   args: Vec<String>,

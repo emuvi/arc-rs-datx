@@ -1,4 +1,4 @@
-use crate::data::Datx;
+use crate::ways::Datx;
 
 impl Datx {
   pub fn start(self) {
