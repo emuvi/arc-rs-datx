@@ -1,3 +1,3 @@
-pub mod exec;
-pub mod make;
+pub mod plan;
+pub mod sail;
 pub mod ways;
