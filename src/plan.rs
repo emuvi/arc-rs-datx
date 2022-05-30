@@ -1,3 +1,5 @@
+use regex::Regex;
+
 use crate::ways::*;
 
 struct Parser {
@@ -65,7 +67,57 @@ impl Parser {
     self.inc_index(inc_by);
   }
 
-  fn parse_load(&mut self) {}
+  fn parse_load(&mut self) {
+    let mut name = String::default();
+    let mut from = LoadFrom::All;
+    let mut hunt = Regex::new(".*").unwrap();
+    let mut zone = Zone::OnBody;
+    let mut delta = 0;
+    let mut inc_by = 1;
+    let mut get_part_of_from_or_break = || {
+      delta += 1;
+      inc_by += 1;
+      let arg = self.get_arg_by(delta);
+      if arg == "from" || arg == "load" || arg == "save" || arg == "" {
+        delta -= 1;
+        inc_by -= 1;
+        false
+      } else if arg.starts_with("r'") {
+        hunt = Regex::new(&arg[2..arg.len() - 1]).unwrap();
+        true
+      } else if arg.starts_with("--") {
+        if arg == "--all" {
+          from = LoadFrom::All;
+        } else if arg == "--the" {
+          delta += 1;
+          inc_by += 1;
+          from = LoadFrom::The(self.get_arg_by(delta).into())
+        } else if arg == "--on-body" {
+          zone = Zone::OnBody;
+        } else if arg == "--on-line" {
+          zone = Zone::OnLine;
+        } else if arg == "--on-load" {
+          delta += 1;
+          inc_by += 1;
+          zone = Zone::OnLoad(self.get_arg_by(delta).into());
+        } else {
+          panic!("Unknown load kind: {}", arg);
+        }
+        true
+      } else {
+        name = arg.into();
+        true
+      }
+    };
+    while get_part_of_from_or_break() {}
+    self.load.push(Load {
+      name,
+      from,
+      hunt,
+      zone,
+    });
+    self.inc_index(inc_by);
+  }
 
   fn parse_save(&mut self) {}
 
