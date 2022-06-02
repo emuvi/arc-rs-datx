@@ -211,14 +211,6 @@ impl Parser {
     }
   }
 
-  // fn get_arg_by(&self, delta: usize) -> &str {
-  //   let arg_by = self.index + delta;
-  //   if arg_by >= self.size() {
-  //     return "";
-  //   }
-  //   &self.args[arg_by]
-  // }
-
   fn size(&self) -> usize {
     self.args.len()
   }
