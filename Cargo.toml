@@ -1,6 +1,6 @@
 [package]
 name = "datx"
-description = "Datx (Data Transform Toolbox) is a library and a command program that features a toolbox with a series of data transformation functionalities."
+description = "Datx (Data Transform Toolbox) is a library and a command program that features a toolbox with a series of data extract, transformation and load functionalities."
 repository = "https://github.com/emuvi/datx/"
 authors = ["Éverton M. Vieira"]
 license = "LGPL-3.0-only"
