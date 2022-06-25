@@ -119,8 +119,8 @@ impl Parser {
   }
 
   fn parse_save(&mut self) {
-    let place = self.get_arg_on();
-    if is_closer(&place) {
+    let onto = self.get_arg_on();
+    if is_closer(&onto) {
       self.save.push(Save::ToFile(OnFile {
         path: vec![Word::As("output.txt".into())],
         body: vec![Word::AsAllLoad],
@@ -128,11 +128,11 @@ impl Parser {
       return;
     }
     self.go_further(1);
-    if place == "--on-file" {
+    if onto == "--on-file" {
       let on_file = self.get_save_on_file();
       self.save.push(Save::ToFile(on_file));
     } else {
-      panic!("Unknown save place: {}", place);
+      panic!("Unknown save onto: {}", onto);
     }
   }
 
@@ -159,6 +159,12 @@ impl Parser {
       if is_closer(&part) {
         break;
       }
+    }
+    if path.is_empty() {
+      path.push(Word::As("output.txt".into()));
+    }
+    if body.is_empty() {
+      body.push(Word::AsAllLoad);
     }
     return OnFile { path, body };
   }
