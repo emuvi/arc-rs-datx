@@ -24,7 +24,7 @@ fn print_usage() {
   println!("");
   println!("MAKE:");
   println!("    from [name] [KIND]");
-  println!("    pick [name] [HUNT] [ZONE]");
+  println!("    pick [name] [HUNT] [LOOK] [ZONE]");
   println!("    save [ONTO]");
   println!("");
   println!("KIND:");
@@ -35,8 +35,13 @@ fn print_usage() {
   println!("HUNT:");
   println!("    r'REGEX'");
   println!("");
+  println!("LOOK:");
+  println!("    --on-whole");
+  println!("    --on-lines");
+  println!("");
   println!("ZONE:");
-  println!("    --all-crude");
+  println!("    --on-all-crude");
+  println!("    --on-all-cooked");
   println!("    --on-crude [name]");
   println!("    --on-cooked [name]");
   println!("");
