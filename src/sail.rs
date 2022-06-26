@@ -175,15 +175,15 @@ fn collect<'a>(
 }
 
 fn save_to_file(processed: &Vec<Cooked>, file: OnFile) -> RubxResult<()> {
-  let path = construct(processed, file.path);
-  let body = construct(processed, file.body);
+  let path = construct(processed, file.path)?;
+  let body = construct(processed, file.body)?;
   use std::io::Write;
   let mut writer = std::fs::File::create(path)?;
   writer.write_all(body.as_bytes())?;
   Ok(())
 }
 
-fn construct(processed: &Vec<Cooked>, dict: Dict) -> String {
+fn construct(processed: &Vec<Cooked>, dict: Dict) -> RubxResult<String> {
   let mut result = String::new();
   for word in dict {
     match word {
@@ -198,7 +198,8 @@ fn construct(processed: &Vec<Cooked>, dict: Dict) -> String {
           result.push_str(cooked.data.as_str());
         }
       }
+      Word::AsStdInLine => result.push_str(read_stdin_line()?.as_str()),
     }
   }
-  result
+  Ok(result)
 }

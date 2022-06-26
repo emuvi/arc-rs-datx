@@ -62,4 +62,5 @@ pub enum Word {
   As(String),
   AsPicked(String),
   AsAllPicked,
+  AsStdInLine,
 }

@@ -198,6 +198,8 @@ impl Parser {
           on.push(Word::AsPicked(load_name));
         } else if word == "--as-all-picked" {
           on.push(Word::AsAllPicked);
+        } else if word == "--as-stdin-line" {
+          on.push(Word::AsStdInLine);
         } else {
           panic!("Unknown dict word: {}", word);
         }

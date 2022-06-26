@@ -60,5 +60,6 @@ fn print_usage() {
   println!("   --as [word]");
   println!("   --as-picked [name]");
   println!("   --as-all-picked");
+  println!("   --as-stdin-line");
   println!("   --done");
 }
