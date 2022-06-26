@@ -16,20 +16,29 @@ pub struct From {
 #[derive(Debug)]
 pub enum Kind {
   Path(String),
-  StdInPath,
   StdInBody,
+  StdInAllPaths,
+  StdInLinePath,
 }
 
 #[derive(Debug)]
 pub struct Pick {
   pub name: String,
   pub hunt: Regex,
+  pub look: Look,
   pub zone: Zone,
 }
 
 #[derive(Debug)]
+pub enum Look {
+  OnWhole,
+  OnLines,
+}
+
+#[derive(Debug)]
 pub enum Zone {
-  AllCrude,
+  OnAllCrude,
+  OnAllCooked,
   OnCrude(String),
   OnCooked(String),
 }

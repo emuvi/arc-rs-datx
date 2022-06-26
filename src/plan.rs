@@ -65,8 +65,9 @@ impl Parser {
         self.go_further(1);
         Kind::Path(path)
       }
-      "--stdin-path" => Kind::StdInPath,
       "--stdin-body" => Kind::StdInBody,
+      "--stdin-all-paths" => Kind::StdInAllPaths,
+      "--stdin-line-path" => Kind::StdInLinePath,
       "" => Kind::StdInBody,
       _ => panic!("Unknown from kind: {}", kind),
     };
@@ -76,7 +77,8 @@ impl Parser {
   fn parse_pick(&mut self) {
     let mut name = String::default();
     let mut hunt = Regex::new(".*").unwrap();
-    let mut zone = Zone::AllCrude;
+    let mut look = Look::OnWhole;
+    let mut zone = Zone::OnAllCrude;
     let mut get_part_of_from_or_break = || {
       let arg = self.get_arg_on();
       if is_closer(&arg) {
@@ -86,8 +88,14 @@ impl Parser {
       if arg.starts_with("r'") {
         hunt = Regex::new(&arg[2..arg.len() - 1]).unwrap();
       } else if arg.starts_with("--") {
-        if arg == "--all-crude" {
-          zone = Zone::AllCrude;
+        if arg == "--on-whole" {
+          look = Look::OnWhole;
+        } else if arg == "--on-lines" {
+          look = Look::OnLines;
+        } else if arg == "--on-all-crude" {
+          zone = Zone::OnAllCrude;
+        } else if arg == "--on-all-cooked" {
+          zone = Zone::OnAllCooked;
         } else if arg == "--on-crude" {
           let crude = self.get_arg_on();
           self.go_further(1);
@@ -105,7 +113,12 @@ impl Parser {
       true
     };
     while get_part_of_from_or_break() {}
-    self.pick.push(Pick { name, hunt, zone });
+    self.pick.push(Pick {
+      name,
+      hunt,
+      look,
+      zone,
+    });
   }
 
   fn parse_save(&mut self) {
