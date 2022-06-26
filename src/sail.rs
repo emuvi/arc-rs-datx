@@ -18,7 +18,9 @@ impl Datx {
         data,
       });
     }
-    println!("Retrieved: {:?}", retrieved);
+    if self.verbose {
+      println!("Retrieved: {:?}", retrieved);
+    }
     let mut processed: Vec<Cooked> = Vec::new();
     for pick in self.pick {
       let data = cook(&retrieved, &processed, pick.hunt, pick.look, pick.zone)?;
@@ -27,7 +29,14 @@ impl Datx {
         data,
       });
     }
-    println!("Processed: {:?}", processed);
+    if self.verbose {
+      println!("Processed: {:?}", processed);
+    }
+    for save in self.save {
+      match save {
+        Save::ToFile(file) => save_to_file(&processed, file)?,
+      }
+    }
     Ok(())
   }
 }
@@ -163,4 +172,33 @@ fn collect<'a>(
     }
   };
   results
+}
+
+fn save_to_file(processed: &Vec<Cooked>, file: OnFile) -> RubxResult<()> {
+  let path = construct(processed, file.path);
+  let body = construct(processed, file.body);
+  use std::io::Write;
+  let mut writer = std::fs::File::create(path)?;
+  writer.write_all(body.as_bytes())?;
+  Ok(())
+}
+
+fn construct(processed: &Vec<Cooked>, dict: Dict) -> String {
+  let mut result = String::new();
+  for word in dict {
+    match word {
+      Word::As(like) => result.push_str(like.as_str()),
+      Word::AsPicked(name) => {
+        if let Some(cooked) = processed.iter().find(|cooked| cooked.name == name) {
+          result.push_str(cooked.data.as_str())
+        }
+      }
+      Word::AsAllPicked => {
+        for cooked in processed {
+          result.push_str(cooked.data.as_str());
+        }
+      }
+    }
+  }
+  result
 }
