@@ -7,7 +7,7 @@ struct Parser {
   ignore_first: bool,
   index: usize,
   from: Vec<From>,
-  load: Vec<Load>,
+  pick: Vec<Pick>,
   save: Vec<Save>,
 }
 
@@ -18,7 +18,7 @@ impl Parser {
       ignore_first,
       index: 0,
       from: Vec::new(),
-      load: Vec::new(),
+      pick: Vec::new(),
       save: Vec::new(),
     }
   }
@@ -32,7 +32,7 @@ impl Parser {
       self.go_further(1);
       match arg_on.as_ref() {
         "from" => self.parse_from(),
-        "load" => self.parse_load(),
+        "pick" => self.parse_pick(),
         "save" => self.parse_save(),
         _ => panic!("Unknown command: {}", arg_on),
       }
@@ -44,7 +44,7 @@ impl Parser {
     if is_closer(&first) {
       self.from.push(From {
         name: String::default(),
-        kind: FromKind::StdInBody,
+        kind: Kind::StdInBody,
       });
       return;
     }
@@ -63,21 +63,20 @@ impl Parser {
       "--path" => {
         let path = self.get_arg_on();
         self.go_further(1);
-        FromKind::Path(path)
+        Kind::Path(path)
       }
-      "--stdin-path" => FromKind::StdInPath,
-      "--stdin-body" => FromKind::StdInBody,
-      "" => FromKind::StdInBody,
+      "--stdin-path" => Kind::StdInPath,
+      "--stdin-body" => Kind::StdInBody,
+      "" => Kind::StdInBody,
       _ => panic!("Unknown from kind: {}", kind),
     };
     self.from.push(From { name, kind });
   }
 
-  fn parse_load(&mut self) {
+  fn parse_pick(&mut self) {
     let mut name = String::default();
-    let mut from = LoadFrom::All;
     let mut hunt = Regex::new(".*").unwrap();
-    let mut zone = Zone::OnBody;
+    let mut zone = Zone::AllCrude;
     let mut get_part_of_from_or_break = || {
       let arg = self.get_arg_on();
       if is_closer(&arg) {
@@ -87,22 +86,18 @@ impl Parser {
       if arg.starts_with("r'") {
         hunt = Regex::new(&arg[2..arg.len() - 1]).unwrap();
       } else if arg.starts_with("--") {
-        if arg == "--all" {
-          from = LoadFrom::All;
-        } else if arg == "--the" {
-          let the = self.get_arg_on();
+        if arg == "--all-crude" {
+          zone = Zone::AllCrude;
+        } else if arg == "--on-crude" {
+          let crude = self.get_arg_on();
           self.go_further(1);
-          from = LoadFrom::The(the);
-        } else if arg == "--on-body" {
-          zone = Zone::OnBody;
-        } else if arg == "--on-line" {
-          zone = Zone::OnLine;
-        } else if arg == "--on-load" {
-          let load = self.get_arg_on();
+          zone = Zone::OnCrude(crude);
+        } else if arg == "--on-cooked" {
+          let cooked = self.get_arg_on();
           self.go_further(1);
-          zone = Zone::OnLoad(load);
+          zone = Zone::OnCooked(cooked);
         } else {
-          panic!("Unknown load kind: {}", arg);
+          panic!("Unknown pick kind: {}", arg);
         }
       } else {
         name = arg;
@@ -110,12 +105,7 @@ impl Parser {
       true
     };
     while get_part_of_from_or_break() {}
-    self.load.push(Load {
-      name,
-      from,
-      hunt,
-      zone,
-    });
+    self.pick.push(Pick { name, hunt, zone });
   }
 
   fn parse_save(&mut self) {
@@ -123,7 +113,7 @@ impl Parser {
     if is_closer(&onto) {
       self.save.push(Save::ToFile(OnFile {
         path: vec![Word::As("output.txt".into())],
-        body: vec![Word::AsAllLoad],
+        body: vec![Word::AsAllPicked],
       }));
       return;
     }
@@ -164,7 +154,7 @@ impl Parser {
       path.push(Word::As("output.txt".into()));
     }
     if body.is_empty() {
-      body.push(Word::AsAllLoad);
+      body.push(Word::AsAllPicked);
     }
     return OnFile { path, body };
   }
@@ -186,12 +176,12 @@ impl Parser {
           let like = self.get_arg_on();
           self.go_further(1);
           on.push(Word::As(like));
-        } else if word == "--as-load" {
+        } else if word == "--as-picked" {
           let load_name = self.get_arg_on();
           self.go_further(1);
-          on.push(Word::AsLoad(load_name));
-        } else if word == "--as-all-load" {
-          on.push(Word::AsAllLoad);
+          on.push(Word::AsPicked(load_name));
+        } else if word == "--as-all-picked" {
+          on.push(Word::AsAllPicked);
         } else {
           panic!("Unknown dict word: {}", word);
         }
@@ -224,7 +214,7 @@ impl Parser {
   fn get(self) -> Datx {
     Datx {
       from: self.from,
-      load: self.load,
+      pick: self.pick,
       save: self.save,
     }
   }
@@ -237,5 +227,5 @@ pub fn parse(args: Vec<String>, ignore_first: bool) -> Datx {
 }
 
 fn is_closer(arg: &str) -> bool {
-  arg == "from" || arg == "load" || arg == "save" || arg == ""
+  arg == "from" || arg == "pick" || arg == "save" || arg == ""
 }
