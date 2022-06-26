@@ -23,7 +23,7 @@ fn print_usage() {
   println!("");
   println!("MAKE:");
   println!("    from [name] [KIND]");
-  println!("    load [name] [FROM] [HUNT] [ZONE]");
+  println!("    pick [name] [HUNT] [ZONE]");
   println!("    save [ONTO]");
   println!("");
   println!("KIND:");
@@ -31,17 +31,13 @@ fn print_usage() {
   println!("    --stdin-path");
   println!("    --stdin-body");
   println!("");
-  println!("FROM:");
-  println!("    --all");
-  println!("    --the [name]");
-  println!("");
   println!("HUNT:");
   println!("    r'REGEX'");
   println!("");
   println!("ZONE:");
-  println!("    --on-body");
-  println!("    --on-line");
-  println!("    --on-load [name]");
+  println!("    --all-crude");
+  println!("    --on-crude [name]");
+  println!("    --on-cooked [name]");
   println!("");
   println!("ONTO:");
   println!("    --on-file [WORD...]");
@@ -52,7 +48,7 @@ fn print_usage() {
   println!("WORD:");
   println!("   [word]");
   println!("   --as [word]");
-  println!("   --as-load [name]");
-  println!("   --as-all-load");
+  println!("   --as-picked [name]");
+  println!("   --as-all-picked");
   println!("   --done");
 }
