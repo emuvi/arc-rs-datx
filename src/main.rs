@@ -1,16 +1,17 @@
-use std::env;
+use rubx::RubxResult;
 
 #[tokio::main]
-async fn main() {
-  if env::args()
+async fn main() -> RubxResult<()> {
+  if std::env::args()
     .find(|arg| arg == "-h" || arg == "--help")
     .is_some()
   {
     print_usage();
   } else {
-    let args: Vec<String> = env::args().collect();
-    datx::plan::parse(args, true).start();
+    let args: Vec<String> = std::env::args().collect();
+    datx::plan::parse(args, true).start()?;
   }
+  Ok(())
 }
 
 fn print_usage() {
