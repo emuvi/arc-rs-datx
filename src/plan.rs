@@ -6,6 +6,7 @@ struct Parser {
   args: Vec<String>,
   ignore_first: bool,
   index: usize,
+  verbose: bool,
   from: Vec<From>,
   pick: Vec<Pick>,
   save: Vec<Save>,
@@ -17,6 +18,7 @@ impl Parser {
       args,
       ignore_first,
       index: 0,
+      verbose: false,
       from: Vec::new(),
       pick: Vec::new(),
       save: Vec::new(),
@@ -34,6 +36,7 @@ impl Parser {
         "from" => self.parse_from(),
         "pick" => self.parse_pick(),
         "save" => self.parse_save(),
+        "-v" | "--verbose" => self.verbose = true,
         _ => panic!("Unknown command: {}", arg_on),
       }
     }
@@ -226,6 +229,7 @@ impl Parser {
 
   fn get(self) -> Datx {
     Datx {
+      verbose: self.verbose,
       from: self.from,
       pick: self.pick,
       save: self.save,

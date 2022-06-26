@@ -2,6 +2,7 @@ use regex::Regex;
 
 #[derive(Debug)]
 pub struct Datx {
+  pub verbose: bool,
   pub from: Vec<From>,
   pub pick: Vec<Pick>,
   pub save: Vec<Save>,

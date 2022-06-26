@@ -20,7 +20,11 @@ fn print_usage() {
   println!("Datx (Data Transform Toolbox) is a library and a command program that features a toolbox with a series of data extract, transformation and load functionalities.");
   println!("");
   println!("USAGE:");
-  println!("    datx [MAKE...]");
+  println!("    datx [OPTIONS] [MAKE...]");
+  println!("");
+  println!("OPTIONS:");
+  println!("    -h, --help      Prints usage information");
+  println!("    -v, --verbose   Prints verbose messages");
   println!("");
   println!("MAKE:");
   println!("    from [name] [KIND]");
