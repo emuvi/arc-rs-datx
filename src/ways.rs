@@ -3,42 +3,35 @@ use regex::Regex;
 #[derive(Debug)]
 pub struct Datx {
   pub from: Vec<From>,
-  pub load: Vec<Load>,
+  pub pick: Vec<Pick>,
   pub save: Vec<Save>,
 }
 
 #[derive(Debug)]
 pub struct From {
   pub name: String,
-  pub kind: FromKind,
+  pub kind: Kind,
 }
 
 #[derive(Debug)]
-pub enum FromKind {
+pub enum Kind {
   Path(String),
   StdInPath,
   StdInBody,
 }
 
 #[derive(Debug)]
-pub struct Load {
+pub struct Pick {
   pub name: String,
-  pub from: LoadFrom,
   pub hunt: Regex,
   pub zone: Zone,
 }
 
 #[derive(Debug)]
-pub enum LoadFrom {
-  All,
-  The(String),
-}
-
-#[derive(Debug)]
 pub enum Zone {
-  OnBody,
-  OnLine,
-  OnLoad(String),
+  AllCrude,
+  OnCrude(String),
+  OnCooked(String),
 }
 
 #[derive(Debug)]
@@ -57,6 +50,6 @@ pub type Dict = Vec<Word>;
 #[derive(Debug)]
 pub enum Word {
   As(String),
-  AsLoad(String),
-  AsAllLoad,
+  AsPicked(String),
+  AsAllPicked,
 }
